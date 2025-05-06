@@ -13,8 +13,8 @@ services:
     environment:
       - DATABASE_URL=sqlite:///./mcp_server.db
       # Azure OpenAI Configuration
-      - AZURE_OPENAI_ENDPOINT=https://sasgenaitest.openai.azure.com
-      - AZURE_OPENAI_KEY=42e04b4fad864a9abb9fcb7403e732c1
+      - AZURE_OPENAI_ENDPOINT=https://genaitest.openai.azure.com
+      - AZURE_OPENAI_KEY=Test
       - AZURE_OPENAI_VERSION=2023-07-01-preview
       # Model Deployment IDs
       - AZURE_OPENAI_PARSER_DEPLOYMENT_ID=gpt-4o
