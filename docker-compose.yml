@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  fastapi:
+    build: 
+      context: .
+      dockerfile: Dockerfile.fastapi
+    container_name: terraform-fastapi
+    ports:
+      - "8000:8000"  # FastAPI
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=sqlite:///./mcp_server.db
+      # Azure OpenAI Configuration
+      - AZURE_OPENAI_ENDPOINT=https://sasgenaitest.openai.azure.com
+      - AZURE_OPENAI_KEY=42e04b4fad864a9abb9fcb7403e732c1
+      - AZURE_OPENAI_VERSION=2023-07-01-preview
+      # Model Deployment IDs
+      - AZURE_OPENAI_PARSER_DEPLOYMENT_ID=gpt-4o
+      - AZURE_OPENAI_GENERATOR_DEPLOYMENT_ID=gpt-4o
+      - AZURE_OPENAI_VALIDATOR_DEPLOYMENT_ID=gpt-4o
+      - AZURE_OPENAI_OPTIMIZER_DEPLOYMENT_ID=gpt-4o 
+      # Enable Azure OpenAI integration
+      - USE_AZURE_OPENAI=true
+    networks:
+      - mcp-network
+
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp  
+    container_name: terraform-mcp
+    ports:
+      - "8001:8001"  # MCP Server
+    volumes:
+      - .:/app
+    environment:
+      - API_BASE_URL=http://fastapi:8000
+    depends_on:
+      - fastapi
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  postgres_data: 
