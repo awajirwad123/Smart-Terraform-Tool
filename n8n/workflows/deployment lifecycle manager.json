@@ -1,0 +1,551 @@
+{
+  "name": "deployment lifecycle manager",
+  "nodes": [
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:9000/api/llm/parser/parse",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 5600000
+        },
+        "bodyParametersJson": "={ \"text\": {{JSON.stringify($json[\"body\"][\"text\"])}} }"
+      },
+      "id": "3a648ff1-4193-41a4-9079-17ad8950e80b",
+      "name": "Natural Language Parser",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:9000/api/llm/generator/terraform",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"requirements\": {{JSON.stringify($json)}} }"
+      },
+      "id": "8d6a4f4f-6aab-43c5-a85d-2b9ebb4d7b7b",
+      "name": "Template Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        20,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:9000/api/llm/validator/validate",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"template_files\": {{JSON.stringify($json[\"template_files\"])}} }"
+      },
+      "id": "a6454647-4366-450c-b9f4-f9cccff2c1d6",
+      "name": "Intelligent Validator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:9000/api/llm/optimizer/cost",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\"template_files\": {{JSON.stringify($('Template Generator').item.json[\"template_files\"])}},\n\"budget_constraint\": 100.0\n}"
+      },
+      "id": "28617c3c-71ad-4e9f-9df1-dd05c4c509b6",
+      "name": "Resource Optimizer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://SAS-7F32LX3:8000/api/llm/validator/validate",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"template_files\": {{JSON.stringify($json.body.template_files)}} }"
+      },
+      "id": "6c7eb182-8217-46aa-913e-c5f71d29bb76",
+      "name": "Intelligent Validator1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "754043fd-321a-4078-9c09-217a85a3f515",
+      "name": "Response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "0daffed1-83f8-4700-805d-1d99e808da28",
+      "name": "Response2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://SAS-7F32LX3:8000/api/llm/optimizer/cost",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={ \"template_files\": {{JSON.stringify($json.body.template_files)}}, \"budget_constraint\": 100.0 }"
+      },
+      "id": "6689dc10-502d-41a0-8a49-09d8feff7751",
+      "name": "Resource Optimizer1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "llm/infra-request",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "77e73010-5ee3-4513-b424-3a9ea63d2ef6",
+      "name": "Integrated Workflow Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -140
+      ],
+      "webhookId": "b72542b9-0379-4831-a4e1-24159713ed97"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "72aac4ff-732f-42c0-83b4-735c1e6fff05",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c1f948fb-fcc5-45f4-9e4f-9d8b1e631fec",
+      "name": "Validation workflow trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        240
+      ],
+      "webhookId": "72aac4ff-732f-42c0-83b4-735c1e6fff05"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0013a4a5-8a02-46d0-8a21-5e3bae91c6b8",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c6adfb53-2337-4efb-9c67-673f81784a86",
+      "name": "Cost Optimization workflow trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        660
+      ],
+      "webhookId": "0013a4a5-8a02-46d0-8a21-5e3bae91c6b8"
+    },
+    {
+      "parameters": {
+        "content": "## Integrated Workflow\n\nIn this workflow takes a text input and creates a terraform template and validate it for cost.\n\n",
+        "height": 360,
+        "width": 2180
+      },
+      "id": "a7ca6a8d-c270-4801-8a26-339c47f47de2",
+      "name": "Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        -320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Validation Workflow\n\nIn this workflow takes a text input and creates a terraform template and validate it and give improvements.\n\n",
+        "height": 280,
+        "width": 840,
+        "color": 4
+      },
+      "id": "836ff4ee-9cc3-48f3-80dc-1798f1f5be3c",
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        140
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Cost optimization Workflow\n\nIn this workflow takes a text input and creates a terraform template and validate it for cost.\n\n",
+        "height": 280,
+        "width": 840,
+        "color": 2
+      },
+      "id": "f6e9d9b3-1674-40f0-b2c6-c6fb4edec851",
+      "name": "Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -480,
+        540
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "test",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "elementName": "Template",
+              "html": "<!-- Your custom HTML here --->\n\n{{ $json.html }}\n"
+            },
+            {
+              "fieldLabel": "Approve",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Approve"
+                  },
+                  {
+                    "option": "Deny"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -140
+      ],
+      "id": "618a7d78-ce7f-4813-b65a-239a6f1c8898",
+      "name": "Wait",
+      "webhookId": "060baec3-9708-4470-9d0b-646b30cee06a"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wyfKglggCWwE0y6W",
+          "mode": "list",
+          "cachedResultName": "Terraform deployment lifecycle"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "site": "test",
+            "workspace": "test",
+            "terraform_files": "={\"template_files\": {{ $('Resource Optimizer').item.json.template_files }}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "site",
+              "displayName": "site",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "workspace",
+              "displayName": "workspace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "terraform_files",
+              "displayName": "terraform_files",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1500,
+        -160
+      ],
+      "id": "e7b7bf9a-6e64-463b-bc2d-3b2196a046f2",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const templates = $json[\"template_files\"];\n\nfunction escapeHTML(str) {\n  return str.replace(/&/g, \"&amp;\")\n            .replace(/</g, \"&lt;\")\n            .replace(/>/g, \"&gt;\");\n}\n\nlet html = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Terraform Template Files</title>\n</head>\n<body>\n  <h1>Terraform Template Files</h1>\n`;\n\nfor (const [filename, content] of Object.entries(templates)) {\n  html += `\n  <h2>${filename}</h2>\n  <pre><code>${escapeHTML(content)}</code></pre>\n`;\n}\n\nhtml += `\n</body>\n</html>\n`;\n\nreturn [{ json: { html } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -140
+      ],
+      "id": "50ab474e-4a4d-48b4-8460-a23994a2c766",
+      "name": "Generate approval form"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "84dacbfa-c85e-495e-8a84-5c5053435efb",
+              "leftValue": "={{ $json.Approve }}",
+              "rightValue": "Approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1260,
+        -140
+      ],
+      "id": "bc7fc43d-6369-4d26-aeb3-69c25f1d04b5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        620,
+        -140
+      ],
+      "id": "69e4e755-4955-4353-8bc2-f8edc2754efc",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Natural Language Parser": {
+      "main": [
+        [
+          {
+            "node": "Template Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Template Generator": {
+      "main": [
+        [
+          {
+            "node": "Intelligent Validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intelligent Validator": {
+      "main": [
+        [
+          {
+            "node": "Resource Optimizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resource Optimizer": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intelligent Validator1": {
+      "main": [
+        [
+          {
+            "node": "Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resource Optimizer1": {
+      "main": [
+        [
+          {
+            "node": "Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Integrated Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Natural Language Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation workflow trigger": {
+      "main": [
+        [
+          {
+            "node": "Intelligent Validator1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cost Optimization workflow trigger": {
+      "main": [
+        [
+          {
+            "node": "Resource Optimizer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate approval form": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Generate approval form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a79681b8-1da9-4f3a-a6e4-d924c5f3ce96",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b74aa28f9a824561d27eb3afe17c00bd831a6bceced2389397bde8870a9337f8"
+  },
+  "id": "QssnsCAEo47rY9wO",
+  "tags": []
+}
